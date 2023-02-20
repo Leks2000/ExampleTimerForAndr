@@ -1,88 +1,173 @@
 package com.example.testunit
 
-import android.graphics.PorterDuff
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.view.View
 import android.widget.Button
-import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.math.RoundingMode
 
 class MainActivity : AppCompatActivity() {
 
-
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val StartButton: Button = findViewById(R.id.ButtonStart)
-        val CheckButton: Button = findViewById(R.id.ButtonCheck)
-        val mEdit: EditText  = findViewById(R.id.Result)
-        var count = 0
-        var CountCorrect = 0
-        var CountInCorrect = 0
-        var result = ""
-        StartButton.setOnClickListener {
-            val FirstText: TextView = findViewById(R.id.TextFirstOperand)
-            val SecondText: TextView = findViewById(R.id.TextSecondOperand)
-            val OperationText: TextView = findViewById(R.id.Operation)
-            mEdit.getBackground().mutate().setColorFilter(getResources().getColor(android.R.color.black), PorterDuff.Mode.SRC_ATOP)
-            val FirstNum = (10..99).random()
-            var SecNum = (10..99).random()
-            val randSign = (1..4).random()
-            when(randSign){
-                1 -> OperationText.text = "*"
-                2 -> OperationText.text = "/"
-                3 -> OperationText.text = "+"
-                4 -> OperationText.text = "-"
-            }
-            if(randSign == 1){
-                result = (FirstNum * SecNum).toString()
-            }
-            if(randSign == 2){
-                while (FirstNum % SecNum !== 0){
-                    SecNum = (10..99).random()
-                }
-                result = (FirstNum  / SecNum).toString()
-            }
-            if(randSign == 3){
-                result = (FirstNum + SecNum).toString()
+        tvmrec  = findViewById(R.id.TVRec)
+        tvavg = findViewById(R.id.TVAvg)
+        tvmax = findViewById(R.id.TVMax)
+        btnStart = findViewById(R.id.buttonStart)
+        btncor = findViewById(R.id.BtnCorrect)
+        btnIncor = findViewById(R.id.BtnIncorrect)
+        mEdit = findViewById(R.id.TVResult)
+        allTest = findViewById(R.id.ressultOfAllEx)
+        correct = findViewById(R.id.Correct)
+        inCorrect = findViewById(R.id.Incorrect)
+        exampleLine = findViewById(R.id.ExampleLine)
+        percent = findViewById(R.id.ResultInPercent)
+        btncor.isEnabled = false
+        btnIncor.isEnabled = false
+    }
+    private var result = ""
+    private lateinit var percent: TextView
+    private lateinit var allTest: TextView
+    private lateinit var correct: TextView
+    private lateinit var inCorrect: TextView
+    private lateinit var tvavg: TextView
+    private lateinit var tvmrec: TextView
+    lateinit var tvmax: TextView
+    private lateinit var mEdit: TextView
+    private lateinit var btncor:Button
+    private lateinit var btnStart:Button
+    private lateinit var btnIncor: Button
+    private lateinit var exampleLine: LinearLayout
+    private var count = 0
+    private var countCorrect = 0
+    private var countInCorrect = 0
+    private var alltime = 0
+    private var countForAvg = 0
+    private fun createExample(){
+        val mEdit = findViewById<TextView>(R.id.TVResult)
+        val firstText: TextView = findViewById(R.id.TextFirstOperand)
+        val secondText: TextView = findViewById(R.id.TextSecondOperand)
+        val operationText: TextView = findViewById(R.id.Operation)
+        val firstNum = (10..99).random()
+        val secNum = (10..99).random()
+        val randSign = (1..4).random()
+        when(randSign){
+            1 -> operationText.text = "*"
+            2 -> operationText.text = "/"
+            3 -> operationText.text = "+"
+            4 -> operationText.text = "-"
+        }
+        if(randSign == 1){
+            result = (firstNum * secNum).toString()
+        }
+        if(randSign == 2){
+            result = (firstNum.toBigDecimal().divide(secNum.toBigDecimal(), 2, RoundingMode.HALF_UP)).toString()
+        }
+        if(randSign == 3){
+            result = (firstNum + secNum).toString()
 
-            }
-            if(randSign == 4){
-                result = (FirstNum - SecNum).toString()
-            }
-            SecondText.text = SecNum.toString()
-            FirstText.text = FirstNum.toString()
-            CheckButton.isClickable = true
-            StartButton.isClickable = false
-            mEdit.isEnabled = true
-            mEdit.isClickable = true
+        }
+        if(randSign == 4){
+            result = (firstNum - secNum).toString()
+        }
+        val randForAnswer = (1..2).random()
+        if (randForAnswer == 1){
+            mEdit.text = result
+        }
+        if (randForAnswer == 2){
+            mEdit.text = (10..99).random().toString()
+        }
+        secondText.text = secNum.toString()
+        firstText.text = firstNum.toString()
+    }
+    fun corButton(view: View){
+        count++
+        allTest.text = count.toString()
+        if (result == mEdit.text.toString()){
+            exampleLine.setBackgroundColor(Color.parseColor("#FF00FF00"))
+            countCorrect++
+            correct.text = countCorrect.toString()
+            recordSecond()
+        }else{
+            exampleLine.setBackgroundColor(Color.parseColor("#FFFF0000"))
+            countInCorrect++
+            inCorrect.text = countInCorrect.toString()
+        }
+        forAvgTime()
+        reboot()
+        stopButton()
+    }
+    private fun forAvgTime(){
+        alltime += counter
+        countForAvg++
+        tvavg.text = (alltime/countForAvg).toString()
+    }
+    @SuppressLint("SetTextI18n")
+    private fun reboot(){
+        percent.text = (countCorrect.toBigDecimal().divide(count.toBigDecimal(), 2, RoundingMode.HALF_UP)).toString() + "%"
+    }
+    fun startButton(view: View){
+        timerStart()
+        btncor.isEnabled = true
+        btnIncor.isEnabled = true
+        createExample()
+        btnStart.isEnabled = false
+    }
+    private fun stopButton(){
+        timerStop()
+        btnStart.isEnabled = true
+        btncor.isEnabled = false
+        btnIncor.isEnabled = false
+    }
+    fun inCor(view: View){
+        val allTest: TextView = findViewById(R.id.ressultOfAllEx)
+        val correct: TextView = findViewById(R.id.Correct)
+        val inCorrect: TextView = findViewById(R.id.Incorrect)
+        count++
+        allTest.text = count.toString()
+        if (result !== mEdit.text.toString()){
+            exampleLine.setBackgroundColor(Color.parseColor("#FF00FF00"))
+            countCorrect++
+            correct.text = countCorrect.toString()
+            recordSecond()
+        }else{
+            exampleLine.setBackgroundColor(Color.parseColor("#FFFF0000"))
+            countInCorrect++
+            inCorrect.text = countInCorrect.toString()
+        }
+        forAvgTime()
+        reboot()
+        stopButton()
+    }
+    var counter = 0
+    private var record = 60
+    private val timer = object: CountDownTimer(50000, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+            counter++
+            tvmax.text=("$counter")
         }
 
-        CheckButton.setOnClickListener {
-            val AllTest: TextView = findViewById(R.id.ressultOfAllEx)
-            val Percent: TextView = findViewById(R.id.ResultInPercent)
-            val Correct: TextView = findViewById(R.id.Correct)
-            val InCorrect: TextView = findViewById(R.id.Incorrect)
-            count++
-            AllTest.text = count.toString()
-            if (result == mEdit.text.toString()){
-                CountCorrect++
-                Correct.text = CountCorrect.toString()
-                mEdit.getBackground().mutate().setColorFilter(getResources().getColor(android.R.color.holo_green_light), PorterDuff.Mode.SRC_ATOP)
-            }else{
-                CountInCorrect++
-                InCorrect.text = CountInCorrect.toString()
-                mEdit.getBackground().mutate().setColorFilter(getResources().getColor(android.R.color.holo_red_light), PorterDuff.Mode.SRC_ATOP)
-            }
-            Percent.text = (CountCorrect.toBigDecimal().divide(count.toBigDecimal(), 2, RoundingMode.HALF_UP)).toString() + "%"
-            Toast.makeText(this, "Правильный ответ был:  ${result} Вы ввели ${mEdit.text}", Toast.LENGTH_SHORT).show()
-            CheckButton.isClickable = false
-            StartButton.isClickable = true
-            mEdit.isEnabled = false
-            mEdit.isClickable = false
+        override fun onFinish() {
+        }
+    }
+        private fun timerStart(){
+            timer.start()
+        }
+        private fun timerStop(){
+            timer.cancel()
+            counter = 0
+        }
+    private fun recordSecond(){
+        if(record > counter) {
+            record = counter
+            tvmrec.text = record.toString()
         }
     }
 }
