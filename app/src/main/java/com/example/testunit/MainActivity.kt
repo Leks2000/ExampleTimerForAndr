@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.math.RoundingMode
+import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity() {
 
@@ -107,11 +108,16 @@ class MainActivity : AppCompatActivity() {
     private fun forAvgTime(){
         alltime += counter
         countForAvg++
-        tvavg.text = (alltime/countForAvg).toString()
+        tvavg.text = ((alltime/countForAvg)*100).toString()
     }
     @SuppressLint("SetTextI18n")
     private fun reboot(){
-        percent.text = (countCorrect.toBigDecimal().divide(count.toBigDecimal(), 2, RoundingMode.HALF_UP)).toString() + "%"
+        val formfar = if (countCorrect == 0){
+            DecimalFormat("#.#")
+        } else{
+            DecimalFormat("#.0")
+        }
+        percent.text = formfar.format(countCorrect.toBigDecimal().divide(count.toBigDecimal(), 3, RoundingMode.HALF_UP)*100.toBigDecimal()) + "%"
     }
     fun startButton(view: View){
         timerStart()

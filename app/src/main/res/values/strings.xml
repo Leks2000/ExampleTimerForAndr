@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">TestUnit</string>
+    <string name="app_name">Тест на время</string>
+    <string name="correct">Правильно</string>
+    <string name="НЕВЕРНО">НЕВЕРНО</string>
+    <string name="Incorrect">Не Правильно</string>
+    <string name="_0">0</string>
+    <string name="zero">0</string>
+    <string name="_00">00</string>
+    <string name="plus">+</string>
+    <string name="zerozero">00</string>
+    <string name="wqe">0</string>
+    <string name="resitog">Итого решено примеров</string>
 </resources>
