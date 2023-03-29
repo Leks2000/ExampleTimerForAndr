@@ -267,7 +267,7 @@
             android:layout_width="67dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Рекорд"
+            android:text="Минимум"
             android:textAlignment="center"
             tools:ignore="HardcodedText" />
 
@@ -276,7 +276,7 @@
             android:layout_width="67dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Таймер"
+            android:text="Максимум"
             android:textAlignment="center"
             tools:ignore="HardcodedText" />
 

@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        tvmrec  = findViewById(R.id.TVRec)
+        tvmin  = findViewById(R.id.TVRec)
         tvavg = findViewById(R.id.TVAvg)
         tvmax = findViewById(R.id.TVMax)
         btnStart = findViewById(R.id.buttonStart)
@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         percent = findViewById(R.id.ResultInPercent)
         btncor.isEnabled = false
         btnIncor.isEnabled = false
+
     }
     private var result = ""
     private lateinit var percent: TextView
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var correct: TextView
     private lateinit var inCorrect: TextView
     private lateinit var tvavg: TextView
-    private lateinit var tvmrec: TextView
+    private lateinit var tvmin: TextView
     lateinit var tvmax: TextView
     private lateinit var mEdit: TextView
     private lateinit var btncor:Button
@@ -49,8 +50,7 @@ class MainActivity : AppCompatActivity() {
     private var count = 0
     private var countCorrect = 0
     private var countInCorrect = 0
-    private var alltime = 0
-    private var countForAvg = 0
+    var arr = arrayOf<Int>()
     private fun createExample(){
         val mEdit = findViewById<TextView>(R.id.TVResult)
         val firstText: TextView = findViewById(R.id.TextFirstOperand)
@@ -95,21 +95,15 @@ class MainActivity : AppCompatActivity() {
             exampleLine.setBackgroundColor(Color.parseColor("#FF00FF00"))
             countCorrect++
             correct.text = countCorrect.toString()
-            recordSecond()
         }else{
             exampleLine.setBackgroundColor(Color.parseColor("#FFFF0000"))
             countInCorrect++
             inCorrect.text = countInCorrect.toString()
         }
-        forAvgTime()
         reboot()
         stopButton()
     }
-    private fun forAvgTime(){
-        alltime += counter
-        countForAvg++
-        tvavg.text = ((alltime/countForAvg)*100).toString()
-    }
+
     @SuppressLint("SetTextI18n")
     private fun reboot(){
         val formfar = if (countCorrect == 0){
@@ -121,6 +115,7 @@ class MainActivity : AppCompatActivity() {
     }
     fun startButton(view: View){
         timerStart()
+        exampleLine.setBackgroundColor(Color.parseColor("#00000000"))
         btncor.isEnabled = true
         btnIncor.isEnabled = true
         createExample()
@@ -142,22 +137,19 @@ class MainActivity : AppCompatActivity() {
             exampleLine.setBackgroundColor(Color.parseColor("#FF00FF00"))
             countCorrect++
             correct.text = countCorrect.toString()
-            recordSecond()
         }else{
             exampleLine.setBackgroundColor(Color.parseColor("#FFFF0000"))
             countInCorrect++
             inCorrect.text = countInCorrect.toString()
         }
-        forAvgTime()
         reboot()
         stopButton()
     }
     var counter = 0
-    private var record = 60
-    private val timer = object: CountDownTimer(50000, 1000) {
+    var index = 0
+    private val timer = object: CountDownTimer(20000, 10) {
         override fun onTick(millisUntilFinished: Long) {
             counter++
-            tvmax.text=("$counter")
         }
 
         override fun onFinish() {
@@ -168,12 +160,15 @@ class MainActivity : AppCompatActivity() {
         }
         private fun timerStop(){
             timer.cancel()
+            arr += counter
+            index +=1
+
+            val formfar = DecimalFormat("#.##")
+            tvmax.text = formfar.format((arr.max().toBigDecimal())*0.01.toBigDecimal()).toString()
+            tvmin.text = formfar.format((arr.min().toBigDecimal())*0.01.toBigDecimal()).toString()
+            tvavg.text = formfar.format(arr.sum().toBigDecimal().divide(index.toBigDecimal(), 3, RoundingMode.HALF_UP)*0.01.toBigDecimal()).toString()
+
             counter = 0
         }
-    private fun recordSecond(){
-        if(record > counter) {
-            record = counter
-            tvmrec.text = record.toString()
-        }
-    }
+
 }
